@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_ip_geolocation',
+    'ratelimit',
     'ip_tracking',
 ]
 
@@ -44,6 +46,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django_ip_geolocation.middleware.IpGeolocationMiddleware',
     'ip_tracking.middleware.RequestLoggingMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -123,3 +126,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ATELIMIT_ENABLE = True
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379/0"   # or RabbitMQ if you prefer
+CELERY_BEAT_SCHEDULE = {
+    "detect_anomalies_hourly": {
+        "task": "ip_tracking.tasks.detect_anomalies",
+        "schedule": 3600.0,  # Run every hour
+    },
+}
+
+
